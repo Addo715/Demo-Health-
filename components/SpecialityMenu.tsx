@@ -25,15 +25,17 @@ const SpecialityMenu: React.FC = () => {
         {(specialityData as SpecialityItem[]).map((item, index) => (
           <TouchableOpacity
             key={index}
-            className="items-center mr-4"
+            className="items-center mr-6"
           // onPress={()=> router.push(`/(tabs)/doctors/$item.speciality`)}
           >
-            <Image
-              source={item.image}
-              className="w-16 h-16 mb-2"
-              contentFit="contain"
-            />
-            <Text className="text-xs text-gray-900">{item.speciality}</Text>
+            <View className="w-20 h-20 bg-blue-50 rounded-full items-center justify-center mb-3">
+              <Image
+                source={item.image}
+                className="w-12 h-12"
+                contentFit="contain"
+              />
+            </View>
+            <Text className="text-[13px] font-medium text-gray-700">{item.speciality}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>

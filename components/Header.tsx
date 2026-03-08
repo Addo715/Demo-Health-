@@ -3,39 +3,44 @@ import { Image } from 'expo-image';
 import { cssInterop } from 'nativewind';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 cssInterop(Image, { className: 'style' });
 
 const Header: React.FC = () => {
+  const insets = useSafeAreaInsets();
   return (
-    <View className="flex-row flex-wrap bg-[#5f6FFF] rounded-lg px-5">
+    <View
+      className="flex-row bg-[#5f6FFF] rounded-b-[40px] px-6 pb-0 overflow-hidden"
+      style={{ paddingTop: Math.max(insets.top, 20) }}
+    >
       {/* Left */}
-      <View className="flex-1 justify-center gap-4 py-10 min-w-[200px]">
-        <Text className="text-3xl text-white font-semibold leading-tight">
+      <View className="flex-1 justify-center gap-6 py-12">
+        <Text className="text-2xl text-white font-bold leading-tight">
           Book Appointment {'\n'}With Trusted Doctors
         </Text>
-        <View className="flex-row items-center gap-3 flex-wrap">
-          <Image
-            source={assets.group_profiles}
-            className="w-28 h-10"
-            contentFit="contain"
-          />
-          <Text className="text-white text-xs font-light flex-1">
+        <View className="gap-3">
+          <Text className="text-blue-50 text-[11px] font-normal leading-4 max-w-[220px]">
             Simply browse through our extensive list of trusted doctors,
             schedule your appointment hassle-free.
           </Text>
+          <Image
+            source={assets.group_profiles}
+            className="w-24 h-8"
+            contentFit="contain"
+          />
         </View>
-        <TouchableOpacity className="flex-row items-center bg-white px-8 py-3 rounded-full self-start">
-          <Text className="text-gray-600 text-sm">Book Appointment →</Text>
+        <TouchableOpacity className="flex-row items-center bg-white px-10 py-4 rounded-full self-start shadow-sm -mt-2">
+          <Text className="text-[#5f6FFF] font-semibold text-xs">Book Appointment →</Text>
         </TouchableOpacity>
       </View>
 
       {/* Right */}
-      <View className="w-1/2">
+      <View className="w-[52%] items-center justify-end">
         <Image
           source={assets.header_img}
-          className="w-full h-64 rounded-lg"
-          contentFit="cover"
+          className="w-full h-[420px] mt-[-100px] -mb-4"
+          contentFit="contain"
         />
       </View>
     </View>

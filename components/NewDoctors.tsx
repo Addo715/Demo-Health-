@@ -13,20 +13,21 @@ const NewDoctors: React.FC = () => {
 
   const renderItem: ListRenderItem<Doctor> = ({ item }) => (
     <TouchableOpacity
-      className="flex-1 border border-blue-200 rounded-xl overflow-hidden max-w-[48%]"
+      className="flex-1 bg-white border border-gray-100 rounded-2xl overflow-hidden max-w-[48%] shadow-sm pb-2"
     //   onPress={() => router.push(`/appointment/${item._id}`)}
     >
       <Image
         source={item.image}
-        className="w-full h-36 bg-blue-50"
+        className="w-full h-40 bg-indigo-50"
+        contentFit="cover"
       />
-      <View className="p-4">
-        <View className="flex-row items-center gap-2">
+      <View className="p-3">
+        <View className="flex-row items-center gap-1.5 mb-1.5">
           <View className="w-2 h-2 bg-green-500 rounded-full" />
-          <Text className="text-green-500 text-sm">Available</Text>
+          <Text className="text-green-600 text-[11px] font-medium">Available</Text>
         </View>
-        <Text className="text-gray-900 text-lg font-medium">{item.name}</Text>
-        <Text className="text-gray-600 text-sm">{item.speciality}</Text>
+        <Text className="text-gray-900 text-base font-bold" numberOfLines={1}>{item.name}</Text>
+        <Text className="text-gray-500 text-xs mt-0.5">{item.speciality}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -42,10 +43,10 @@ const NewDoctors: React.FC = () => {
         renderItem={renderItem}
       />
       <TouchableOpacity
-        className="bg-blue-50 px-12 py-3 rounded-full mt-10 self-center"
+        className="border border-gray-200 bg-white px-14 py-3.5 rounded-full mt-12 self-center active:bg-gray-50"
         onPress={() => router.push('/doctors')}
       >
-        <Text className="text-gray-600">More</Text>
+        <Text className="text-gray-600 font-semibold text-sm">See More</Text>
       </TouchableOpacity>
     </View>
   );

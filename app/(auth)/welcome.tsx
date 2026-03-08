@@ -1,15 +1,16 @@
-import React, { useState, useRef } from 'react';
+import { useRouter } from 'expo-router';
+import React, { useRef, useState } from 'react';
 import {
-  View,
+  Dimensions,
+  FlatList,
+  Image,
+  StatusBar,
   Text,
   TouchableOpacity,
-  FlatList,
-  Dimensions,
-  StatusBar,
-  Image,
+  View,
   ViewToken,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
@@ -170,7 +171,7 @@ const Welcome = () => {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }} edges={['bottom']}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <FlatList
         ref={flatListRef}
@@ -184,7 +185,7 @@ const Welcome = () => {
         viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
         scrollEventThrottle={16}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
