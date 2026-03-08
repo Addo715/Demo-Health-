@@ -1,15 +1,18 @@
+import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { cssInterop } from "nativewind";
 import React, { useContext, useEffect, useState } from "react";
 import {
   FlatList,
-  Image,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+
+cssInterop(Image, { className: 'style' });
 // import { AppContext, Doctor } from '@/context/AppContext.ts';
-import { AppContext , Doctor} from "@/context/AppContext";
+import { AppContext, Doctor } from "@/context/AppContext";
 
 const specialities = [
   "General physician",
@@ -40,12 +43,12 @@ const doctors: React.FC = () => {
   }, [doctors, speciality]);
 
   const handleSpecialityPress = (item: string) => {
-  if (speciality === item) {
-    router.push("/(tabs)/doctors" );
-  } else {
-    router.push("/(tabs)/doctors");
-  }
-};
+    if (speciality === item) {
+      router.push("/(tabs)/doctors");
+    } else {
+      router.push("/(tabs)/doctors");
+    }
+  };
 
   return (
     <ScrollView className="flex-1 bg-white px-4">
@@ -73,9 +76,8 @@ const doctors: React.FC = () => {
               <TouchableOpacity
                 key={index}
                 onPress={() => handleSpecialityPress(item)}
-                className={`pl-3 py-1.5 pr-16 border border-gray-300 rounded ${
-                  speciality === item ? "bg-[#5F6FFF]" : "bg-white"
-                }`}
+                className={`pl-3 py-1.5 pr-16 border border-gray-300 rounded ${speciality === item ? "bg-[#5F6FFF]" : "bg-white"
+                  }`}
               >
                 <Text
                   className={`text-sm ${speciality === item ? "text-white" : "text-gray-600"}`}
@@ -89,6 +91,7 @@ const doctors: React.FC = () => {
 
         {/* Doctors Grid */}
         <FlatList
+          className="w-full"
           data={filter}
           keyExtractor={(item) => item._id}
           numColumns={2}
@@ -97,10 +100,10 @@ const doctors: React.FC = () => {
           renderItem={({ item }) => (
             <TouchableOpacity
               className="flex-1 border border-blue-200 rounded-xl overflow-hidden max-w-[48%]"
-              // onPress={() => router.push(`/appointment/${item._id}`)}
+            // onPress={() => router.push(`/appointment/${item._id}`)}
             >
               <Image
-                source={{ uri: item.image }}
+                source={item.image}
                 className="w-full h-36 bg-blue-50"
               />
               <View className="p-4">

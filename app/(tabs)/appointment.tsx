@@ -1,6 +1,10 @@
-import React, { useContext } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { AppContext, Doctor } from '@/context/AppContext';
+import { Image } from 'expo-image';
+import { cssInterop } from 'nativewind';
+import React, { useContext } from 'react';
+import { FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+
+cssInterop(Image, { className: 'style' });
 
 const MyAppointment: React.FC = () => {
   const { doctors } = useContext(AppContext);
@@ -28,9 +32,9 @@ const MyAppointment: React.FC = () => {
 
             {/* Image */}
             <Image
-              source={{ uri: item.image }}
+              source={item.image}
               className="w-32 h-32 bg-indigo-50 rounded"
-              resizeMode="cover"
+              contentFit="cover"
             />
 
             {/* Info */}

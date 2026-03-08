@@ -1,7 +1,10 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
 import { assets } from '@/assets/images/assets';
+import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
+import { cssInterop } from 'nativewind';
+import { Text, TouchableOpacity, View } from 'react-native';
+
+cssInterop(Image, { className: 'style' });
 
 const Banner: React.FC = () => {
   const router = useRouter();
@@ -27,7 +30,7 @@ const Banner: React.FC = () => {
         <Image
           source={assets.appointment_img}
           className="w-full h-52"
-          resizeMode="contain"
+          contentFit="contain"
         />
       </View>
     </View>

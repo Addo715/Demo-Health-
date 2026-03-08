@@ -1,8 +1,11 @@
-import React, { useContext } from 'react';
-import { View, Text, Image, TouchableOpacity, FlatList, ListRenderItem } from 'react-native';
+import { AppContext, Doctor } from '@/context/AppContext';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { AppContext } from '@/context/AppContext';
-import { Doctor } from '@/context/AppContext';
+import { cssInterop } from 'nativewind';
+import React, { useContext } from 'react';
+import { FlatList, ListRenderItem, Text, TouchableOpacity, View } from 'react-native';
+
+cssInterop(Image, { className: 'style' });
 
 const NewDoctors: React.FC = () => {
   const router = useRouter();
@@ -12,9 +15,9 @@ const NewDoctors: React.FC = () => {
     <TouchableOpacity
       className="flex-1 border border-blue-200 rounded-xl overflow-hidden max-w-[48%]"
     //   onPress={() => router.push(`/appointment/${item._id}`)}
-    > 
+    >
       <Image
-        source={{ uri: item.image }}
+        source={item.image}
         className="w-full h-36 bg-blue-50"
       />
       <View className="p-4">
@@ -29,7 +32,7 @@ const NewDoctors: React.FC = () => {
   );
 
   return (
-    <View className="items-center gap-4 my-16 mx-2.5">
+    <View className="gap-4 my-16 mx-2.5">
       <FlatList
         data={doctors.slice(0, 10)}
         keyExtractor={(item: Doctor) => item._id}
@@ -39,7 +42,7 @@ const NewDoctors: React.FC = () => {
         renderItem={renderItem}
       />
       <TouchableOpacity
-        className="bg-blue-50 px-12 py-3 rounded-full mt-10"
+        className="bg-blue-50 px-12 py-3 rounded-full mt-10 self-center"
         onPress={() => router.push('/doctors')}
       >
         <Text className="text-gray-600">More</Text>

@@ -1,6 +1,10 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { assets } from '@/assets/images/assets';
+import { Image } from 'expo-image';
+import { cssInterop } from 'nativewind';
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+
+cssInterop(Image, { className: 'style' });
 
 const Header: React.FC = () => {
   return (
@@ -14,7 +18,7 @@ const Header: React.FC = () => {
           <Image
             source={assets.group_profiles}
             className="w-28 h-10"
-            resizeMode="contain"
+            contentFit="contain"
           />
           <Text className="text-white text-xs font-light flex-1">
             Simply browse through our extensive list of trusted doctors,
@@ -31,7 +35,7 @@ const Header: React.FC = () => {
         <Image
           source={assets.header_img}
           className="w-full h-64 rounded-lg"
-          resizeMode="cover"
+          contentFit="cover"
         />
       </View>
     </View>
