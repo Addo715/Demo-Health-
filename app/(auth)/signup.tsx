@@ -12,7 +12,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-const signup = () => {
+const Signup = () => {
   const router = useRouter();
   const [role, setRole] = useState<'patient' | 'doctor'>('patient');
   const [fullName, setFullName] = useState('');
@@ -22,54 +22,45 @@ const signup = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSignup = () => {
-    // 💡 Add your signup logic here
     console.log('Signup:', { role, fullName, email, phone, password });
+    router.push('/(tabs)/home');
   };
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#fff' }}
+      className="flex-1 bg-white"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 28, paddingTop: 60, paddingBottom: 40 }}>
+      <ScrollView contentContainerClassName="flex-grow px-7 pt-16 pb-10">
 
         {/* Back button */}
-        <TouchableOpacity onPress={() => router.back()} style={{ marginBottom: 28 }}>
+        <TouchableOpacity onPress={() => router.back()} className="mb-7">
           <Ionicons name="arrow-back" size={24} color="#111827" />
         </TouchableOpacity>
 
         {/* Heading */}
-        <Text style={{ fontSize: 28, fontWeight: '800', color: '#111827', marginBottom: 8 }}>
-          Create Account
-        </Text>
-        <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 28, lineHeight: 21 }}>
+        <Text className="text-3xl font-extrabold text-gray-900 mb-2">Create Account</Text>
+        <Text className="text-sm text-gray-500 mb-7 leading-6">
           Join DocHome to easily book or manage home doctor visits.
         </Text>
 
-        {/* Role toggle: Patient / Doctor */}
-        <View style={{ flexDirection: 'row', backgroundColor: '#F3F4F6', borderRadius: 12, padding: 4, marginBottom: 28 }}>
+        {/* Role toggle */}
+        <View className="flex-row bg-gray-100 rounded-xl p-1 mb-7">
           {(['patient', 'doctor'] as const).map((r) => (
             <TouchableOpacity
               key={r}
               onPress={() => setRole(r)}
-              style={{
-                flex: 1,
-                paddingVertical: 10,
-                borderRadius: 10,
-                alignItems: 'center',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                gap: 6,
-                backgroundColor: role === r ? '#1A56FF' : 'transparent',
-              }}
+              className={`flex-1 py-2.5 rounded-xl flex-row items-center justify-center gap-1.5 ${
+                role === r ? 'bg-[#1A56FF]' : 'bg-transparent'
+              }`}
             >
               <Ionicons
                 name={r === 'patient' ? 'person-outline' : 'medical-outline'}
                 size={15}
                 color={role === r ? '#fff' : '#6B7280'}
               />
-              <Text style={{ fontWeight: '600', fontSize: 14, color: role === r ? '#fff' : '#6B7280' }}>
+              <Text className={`font-semibold text-sm ${role === r ? 'text-white' : 'text-gray-500'}`}>
                 {r === 'patient' ? 'Patient' : 'Doctor'}
               </Text>
             </TouchableOpacity>
@@ -77,11 +68,11 @@ const signup = () => {
         </View>
 
         {/* Full Name */}
-        <Text style={label}>Full Name</Text>
-        <View style={inputContainer}>
+        <Text className="text-xs font-semibold text-gray-700 mb-2">Full Name</Text>
+        <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5">
           <Ionicons name="person-outline" size={18} color="#9CA3AF" style={{ marginRight: 10 }} />
           <TextInput
-            style={{ flex: 1, fontSize: 14, color: '#111827' }}
+            className="flex-1 text-sm text-gray-900"
             placeholder="Enter your full name"
             placeholderTextColor="#9CA3AF"
             value={fullName}
@@ -90,11 +81,11 @@ const signup = () => {
         </View>
 
         {/* Email */}
-        <Text style={[label, { marginTop: 16 }]}>Email Address</Text>
-        <View style={inputContainer}>
+        <Text className="text-xs font-semibold text-gray-700 mb-2 mt-4">Email Address</Text>
+        <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5">
           <Ionicons name="mail-outline" size={18} color="#9CA3AF" style={{ marginRight: 10 }} />
           <TextInput
-            style={{ flex: 1, fontSize: 14, color: '#111827' }}
+            className="flex-1 text-sm text-gray-900"
             placeholder="Enter your email address"
             placeholderTextColor="#9CA3AF"
             keyboardType="email-address"
@@ -105,11 +96,11 @@ const signup = () => {
         </View>
 
         {/* Phone */}
-        <Text style={[label, { marginTop: 16 }]}>Phone Number</Text>
-        <View style={inputContainer}>
+        <Text className="text-xs font-semibold text-gray-700 mb-2 mt-4">Phone Number</Text>
+        <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5">
           <Ionicons name="call-outline" size={18} color="#9CA3AF" style={{ marginRight: 10 }} />
           <TextInput
-            style={{ flex: 1, fontSize: 14, color: '#111827' }}
+            className="flex-1 text-sm text-gray-900"
             placeholder="Enter your phone number"
             placeholderTextColor="#9CA3AF"
             keyboardType="phone-pad"
@@ -119,11 +110,11 @@ const signup = () => {
         </View>
 
         {/* Password */}
-        <Text style={[label, { marginTop: 16 }]}>Password</Text>
-        <View style={inputContainer}>
+        <Text className="text-xs font-semibold text-gray-700 mb-2 mt-4">Password</Text>
+        <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5">
           <Ionicons name="lock-closed-outline" size={18} color="#9CA3AF" style={{ marginRight: 10 }} />
           <TextInput
-            style={{ flex: 1, fontSize: 14, color: '#111827' }}
+            className="flex-1 text-sm text-gray-900"
             placeholder="Create a password"
             placeholderTextColor="#9CA3AF"
             secureTextEntry={!showPassword}
@@ -138,17 +129,17 @@ const signup = () => {
         {/* Sign Up button */}
         <TouchableOpacity
           onPress={handleSignup}
-          style={{ backgroundColor: '#1A56FF', borderRadius: 14, paddingVertical: 16, alignItems: 'center', marginTop: 32 }}
+          className="bg-[#1A56FF] rounded-2xl py-4 items-center mt-8"
           activeOpacity={0.85}
         >
-          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>Sign Up</Text>
+          <Text className="text-white font-bold text-base">Sign Up</Text>
         </TouchableOpacity>
 
         {/* Login link */}
-        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 24 }}>
-          <Text style={{ fontSize: 14, color: '#6B7280' }}>Already have an account? </Text>
+        <View className="flex-row justify-center mt-6">
+          <Text className="text-sm text-gray-500">Already have an account? </Text>
           <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
-            <Text style={{ fontSize: 14, color: '#1A56FF', fontWeight: '700' }}>Log In</Text>
+            <Text className="text-sm text-[#1A56FF] font-bold">Log In</Text>
           </TouchableOpacity>
         </View>
 
@@ -157,22 +148,4 @@ const signup = () => {
   );
 };
 
-const label = {
-  fontSize: 13,
-  fontWeight: '600' as const,
-  color: '#374151',
-  marginBottom: 8,
-};
-
-const inputContainer = {
-  flexDirection: 'row' as const,
-  alignItems: 'center' as const,
-  backgroundColor: '#F9FAFB',
-  borderWidth: 1,
-  borderColor: '#E5E7EB',
-  borderRadius: 12,
-  paddingHorizontal: 16,
-  paddingVertical: 14,
-};
-
-export default signup;
+export default Signup;

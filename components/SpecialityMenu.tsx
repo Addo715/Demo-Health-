@@ -22,7 +22,7 @@ const SpecialityMenu: React.FC = () => {
           <TouchableOpacity
             key={index}
             className="items-center mr-4"
-            onPress={()=> router.push(`/(tabs)/doctors/$item.speciality`)}
+            // onPress={()=> router.push(`/(tabs)/doctors/$item.speciality`)}
           >
             <Image
               source={item.image}

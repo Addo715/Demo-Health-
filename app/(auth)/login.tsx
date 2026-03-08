@@ -19,32 +19,30 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = () => {
-    // 💡 Add your login logic here
     console.log('Login:', email, password);
+    router.push('/(tabs)/home');
   };
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#fff' }}
+      className="flex-1 bg-white"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 28, paddingTop: 100, paddingBottom: 40 }}>
+      <ScrollView contentContainerClassName="flex-grow px-7 pt-24 pb-10">
 
         {/* Heading */}
-        <Text style={{ fontSize: 28, fontWeight: '800', color: '#111827', marginBottom: 8 }}>
-          Welcome Back
-        </Text>
-        <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 36, lineHeight: 21 }}>
+        <Text className="text-3xl font-extrabold text-gray-900 mb-2">Welcome Back</Text>
+        <Text className="text-sm text-gray-500 mb-9 leading-6">
           Log in to your account to easily book your next home doctor visit.
         </Text>
 
         {/* Email */}
-        <Text style={label}>Email Address</Text>
-        <View style={inputContainer}>
+        <Text className="text-xs font-semibold text-gray-700 mb-2">Email Address</Text>
+        <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5">
           <Ionicons name="mail-outline" size={18} color="#9CA3AF" style={{ marginRight: 10 }} />
           <TextInput
-            style={{ flex: 1, fontSize: 14, color: '#111827' }}
+            className="flex-1 text-sm text-gray-900"
             placeholder="robert.smith@email.com"
             placeholderTextColor="#9CA3AF"
             keyboardType="email-address"
@@ -55,11 +53,11 @@ const Login = () => {
         </View>
 
         {/* Password */}
-        <Text style={[label, { marginTop: 20 }]}>Password</Text>
-        <View style={inputContainer}>
+        <Text className="text-xs font-semibold text-gray-700 mb-2 mt-5">Password</Text>
+        <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5">
           <Ionicons name="lock-closed-outline" size={18} color="#9CA3AF" style={{ marginRight: 10 }} />
           <TextInput
-            style={{ flex: 1, fontSize: 14, color: '#111827' }}
+            className="flex-1 text-sm text-gray-900"
             placeholder="••••••••"
             placeholderTextColor="#9CA3AF"
             secureTextEntry={!showPassword}
@@ -72,48 +70,30 @@ const Login = () => {
         </View>
 
         {/* Forgot password */}
-        <TouchableOpacity style={{ alignSelf: 'flex-end', marginTop: 12 }}>
-          <Text style={{ fontSize: 13, color: '#1A56FF', fontWeight: '600' }}>Forgot Password?</Text>
+        <TouchableOpacity className="self-end mt-3">
+          <Text className="text-sm text-[#1A56FF] font-semibold">Forgot Password?</Text>
         </TouchableOpacity>
 
         {/* Login button */}
         <TouchableOpacity
           onPress={handleLogin}
-          style={{ backgroundColor: '#1A56FF', borderRadius: 14, paddingVertical: 16, alignItems: 'center', marginTop: 32 }}
+          className="bg-[#1A56FF] rounded-2xl py-4 items-center mt-8"
           activeOpacity={0.85}
         >
-          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>Log In</Text>
+          <Text className="text-white font-bold text-base">Log In</Text>
         </TouchableOpacity>
 
         {/* Sign up link */}
-        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 24 }}>
-          <Text style={{ fontSize: 14, color: '#6B7280' }}>Don't have an account? </Text>
+        <View className="flex-row justify-center mt-6">
+          <Text className="text-sm text-gray-500">Don't have an account? </Text>
           <TouchableOpacity onPress={() => router.push('/(auth)/signup')}>
-            <Text style={{ fontSize: 14, color: '#1A56FF', fontWeight: '700' }}>Sign Up</Text>
+            <Text className="text-sm text-[#1A56FF] font-bold">Sign Up</Text>
           </TouchableOpacity>
         </View>
 
       </ScrollView>
     </KeyboardAvoidingView>
   );
-};
-
-const label = {
-  fontSize: 13,
-  fontWeight: '600' as const,
-  color: '#374151',
-  marginBottom: 8,
-};
-
-const inputContainer = {
-  flexDirection: 'row' as const,
-  alignItems: 'center' as const,
-  backgroundColor: '#F9FAFB',
-  borderWidth: 1,
-  borderColor: '#E5E7EB',
-  borderRadius: 12,
-  paddingHorizontal: 16,
-  paddingVertical: 14,
 };
 
 export default Login;
