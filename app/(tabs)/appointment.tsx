@@ -1,11 +1,8 @@
 import { AppContext, Doctor } from '@/context/AppContext';
 import { Image } from 'expo-image';
-import { cssInterop } from 'nativewind';
 import React, { useContext } from 'react';
 import { FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-cssInterop(Image, { className: 'style' });
 
 const MyAppointment: React.FC = () => {
   const { doctors } = useContext(AppContext);

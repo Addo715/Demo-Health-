@@ -1,6 +1,6 @@
+import { AppContext, Doctor } from "@/context/AppContext";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { cssInterop } from "nativewind";
 import React, { useContext, useEffect, useState } from "react";
 import {
   FlatList,
@@ -10,10 +10,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-cssInterop(Image, { className: 'style' });
-// import { AppContext, Doctor } from '@/context/AppContext.ts';
-import { AppContext, Doctor } from "@/context/AppContext";
 
 const specialities = [
   "General physician",

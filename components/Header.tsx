@@ -1,11 +1,8 @@
 import { assets } from '@/assets/images/assets';
 import { Image } from 'expo-image';
-import { cssInterop } from 'nativewind';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-cssInterop(Image, { className: 'style' });
 
 const Header: React.FC = () => {
   const insets = useSafeAreaInsets();
