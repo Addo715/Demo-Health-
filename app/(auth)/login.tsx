@@ -1,16 +1,16 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StatusBar,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StatusBar,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 
 const Login = () => {
   const router = useRouter();
@@ -20,7 +20,7 @@ const Login = () => {
 
   const handleLogin = () => {
     console.log('Login:', email, password);
-    router.push('/(tabs)/home');
+    router.replace('/(tabs)/home');
   };
 
   return (
