@@ -30,7 +30,7 @@ const DAYS_OF_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] as const
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-const appointment: React.FC = () => {
+const Appointment: React.FC = () => {
   const { docId } = useLocalSearchParams<{ docId: string }>()
 
   const { doctors, currencySymbol } = useContext(AppContext)
@@ -221,4 +221,4 @@ const appointment: React.FC = () => {
   )
 }
 
-export default appointment
+export default Appointment

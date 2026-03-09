@@ -20,7 +20,7 @@ const specialities = [
   "Gastroenterologist",
 ];
 
-const doctors: React.FC = () => {
+const Doctors: React.FC = () => {
   const router = useRouter();
   const { speciality } = useLocalSearchParams<{ speciality?: string }>();
   const { doctors } = useContext(AppContext);
@@ -123,4 +123,4 @@ const doctors: React.FC = () => {
   );
 };
 
-export default doctors;
+export default Doctors;

@@ -8,16 +8,15 @@ const Header: React.FC = () => {
   const insets = useSafeAreaInsets();
   return (
     <View
-      className="flex-row bg-[#5f6FFF] rounded-b-[40px] px-6 pb-0 overflow-hidden"
+      className="bg-[#5f6FFF] rounded-b-[40px] px-6 pb-0 overflow-hidden items-center"
       style={{ paddingTop: Math.max(insets.top, 20) }}
     >
-      {/* Left */}
-      <View className="flex-1 justify-center gap-6 py-12">
-        <Text className="text-2xl text-white font-bold leading-tight">
+      <View className="items-center gap-6 py-12">
+        <Text className="text-2xl text-white font-bold leading-tight text-center">
           Book Appointment {'\n'}With Trusted Doctors
         </Text>
-        <View className="gap-3">
-          <Text className="text-blue-50 text-[11px] font-normal leading-4 max-w-[220px]">
+        <View className="items-center gap-3">
+          <Text className="text-blue-50 text-[11px] font-normal leading-4 text-center max-w-[220px]">
             Simply browse through our extensive list of trusted doctors,
             schedule your appointment hassle-free.
           </Text>
@@ -27,18 +26,9 @@ const Header: React.FC = () => {
             contentFit="contain"
           />
         </View>
-        <TouchableOpacity className="flex-row items-center bg-white px-10 py-4 rounded-full self-start shadow-sm -mt-2">
+        <TouchableOpacity className="flex-row items-center bg-white px-10 py-4 rounded-full self-center shadow-sm -mt-2">
           <Text className="text-[#5f6FFF] font-semibold text-xs">Book Appointment →</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* Right */}
-      <View className="w-[52%] items-center justify-end">
-        <Image
-          source={assets.header_img}
-          className="w-full h-[420px] mt-[-100px] -mb-4"
-          contentFit="contain"
-        />
       </View>
     </View>
   );

@@ -1,87 +1,164 @@
-// import { Tabs } from 'expo-router';
-// import React from 'react';
+import { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
+import { Tabs } from "expo-router";
+import { CalendarDays, Home, Search, UserRound } from "lucide-react-native";
+import React from "react";
+import { Animated, Pressable } from "react-native";
 
-// import { HapticTab } from '@/components/haptic-tab';
-// import { IconSymbol } from '@/components/ui/icon-symbol';
-// import { Colors } from '@/constants/theme';
-// import { useColorScheme } from '@/hooks/use-color-scheme';
+const TAB_BAR_BG = "#1a1a2e";
+const ACTIVE_BG = "#5f6FFF";
+const INACTIVE_COLOR = "#888";
+const ACTIVE_COLOR = "#fff";
 
-// export default function TabLayout() {
-//   const colorScheme = useColorScheme();
+type AnimatedTabButtonProps = {
+  children: React.ReactNode;
+  onPress?: BottomTabBarButtonProps["onPress"];
+  onLongPress?: BottomTabBarButtonProps["onLongPress"];
+  isFocused: boolean;
+  label: string;
+};
 
-//   return (
-//     <Tabs
-//       screenOptions={{
-//         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-//         headerShown: false,
-//         tabBarButton: HapticTab,
-//       }}>
-//       <Tabs.Screen
-//         name="index"
-//         options={{
-//           title: 'Home',
-//           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-//         }}
-//       />
-//       <Tabs.Screen
-//         name="explore"
-//         options={{
-//           title: 'Explore',
-//           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-//         }}
-//       />
-//     </Tabs>
-//   );
-// }
+function AnimatedTabButton({
+  children,
+  onPress,
+  onLongPress,
+  isFocused,
+  label,
+}: AnimatedTabButtonProps) {
+  const scale = React.useRef(new Animated.Value(1)).current;
+  const widthAnim = React.useRef(new Animated.Value(isFocused ? 1 : 0)).current;
 
+  React.useEffect(() => {
+    Animated.spring(widthAnim, {
+      toValue: isFocused ? 1 : 0,
+      useNativeDriver: false,
+      friction: 7,
+      tension: 60,
+    }).start();
+  }, [isFocused]);
 
-import { Tabs } from 'expo-router';
-import React from 'react';
+  const handlePressIn = () =>
+    Animated.spring(scale, {
+      toValue: 0.9,
+      useNativeDriver: true,
+      friction: 5,
+    }).start();
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+  const handlePressOut = () =>
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      friction: 5,
+    }).start();
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const animatedWidth = widthAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [48, 120],
+  });
+
+  const labelOpacity = widthAnim.interpolate({
+    inputRange: [0, 0.6, 1],
+    outputRange: [0, 0, 1],
+  });
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}
+    <Pressable
+      onPress={(e) => onPress?.(e)}
+      onLongPress={(e) => onLongPress?.(e)}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
     >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+      <Animated.View
+        style={{
+          transform: [{ scale }],
+          width: animatedWidth,
+          height: 46,
+          borderRadius: 23,
+          backgroundColor: isFocused ? ACTIVE_BG : "transparent",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6,
+          overflow: "hidden",
         }}
-      />
-      <Tabs.Screen
-        name="doctors"
-        options={{
-          title: 'Doctors',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="stethoscope" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="booking"
-        options={{
-          title: 'Booking',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="calendar" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="my-profile"
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
-        }}
-      />
+      >
+        {children}
+        <Animated.Text
+          style={{
+            opacity: labelOpacity,
+            color: ACTIVE_COLOR,
+            fontWeight: "600",
+            fontSize: 13,
+          }}
+          numberOfLines={1}
+        >
+          {label}
+        </Animated.Text>
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+const TABS = [
+  { name: "home", label: "Home", Icon: Home },
+  { name: "doctors", label: "Doctors", Icon: Search },
+  { name: "booking", label: "Booking", Icon: CalendarDays },
+  { name: "my-profile", label: "Profile", Icon: UserRound },
+] as const;
+
+export default function TabLayout() {
+  return (
+    <Tabs
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          backgroundColor: TAB_BAR_BG,
+          borderTopWidth: 0,
+          height: 70,
+          paddingBottom: 10,
+          paddingTop: 10,
+          paddingHorizontal: 8,
+          borderRadius: 40,
+          marginHorizontal: 16,
+          marginBottom: 20,
+          position: "absolute",
+          elevation: 10,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 12,
+        },
+        tabBarButton: (props: BottomTabBarButtonProps) => {
+          const tab = TABS.find((t) => t.name === route.name);
+          if (!tab) return null;
+          const { Icon, label } = tab;
+          const isFocused = props.accessibilityState?.selected ?? false;
+
+          return (
+            <AnimatedTabButton
+              onPress={props.onPress}
+              onLongPress={props.onLongPress}
+              isFocused={isFocused}
+              label={label}
+            >
+              <Icon
+                size={22}
+                color={isFocused ? ACTIVE_COLOR : INACTIVE_COLOR}
+                strokeWidth={isFocused ? 2.5 : 1.8}
+              />
+            </AnimatedTabButton>
+          );
+        },
+      })}
+    >
+      {TABS.map((tab) => (
+        <Tabs.Screen
+          key={tab.name}
+          name={tab.name}
+          options={{ title: tab.label }}
+        />
+      ))}
     </Tabs>
   );
 }
