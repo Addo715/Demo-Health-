@@ -4,7 +4,7 @@ import React, { useContext } from 'react';
 import { FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const MyAppointment: React.FC = () => {
+const MyBooking: React.FC = () => {
   const { doctors } = useContext(AppContext);
 
   if (!doctors || doctors.length === 0) {
@@ -67,4 +67,4 @@ const MyAppointment: React.FC = () => {
   );
 };
 
-export default MyAppointment;
+export default MyBooking;

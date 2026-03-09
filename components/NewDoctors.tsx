@@ -14,7 +14,7 @@ const NewDoctors: React.FC = () => {
   const renderItem: ListRenderItem<Doctor> = ({ item }) => (
     <TouchableOpacity
       className="flex-1 bg-white border border-gray-100 rounded-2xl overflow-hidden max-w-[48%] shadow-sm pb-2"
-    //   onPress={() => router.push(`/appointment/${item._id}`)}
+      onPress={() => router.push(`/appointment/${item._id}` as any)}
     >
       <Image
         source={item.image}
