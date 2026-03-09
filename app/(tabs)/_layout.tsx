@@ -1,13 +1,25 @@
 import { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
-import { Tabs } from "expo-router";
-import { CalendarDays, Home, Search, UserRound } from "lucide-react-native";
-import React from "react";
-import { Animated, Pressable } from "react-native";
+import { Tabs, usePathname } from "expo-router";
+import {
+  CalendarDays as CalendarIcon,
+  Home as HomeIcon,
+  Search as SearchIcon,
+  UserRound as UserIcon,
+} from "lucide-react-native";
+import React, { useEffect } from "react";
+import { Pressable, View } from "react-native";
+import Animated, {
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 const TAB_BAR_BG = "#1a1a2e";
-const ACTIVE_BG = "#5f6FFF";
-const INACTIVE_COLOR = "#888";
-const ACTIVE_COLOR = "#fff";
+const ACTIVE_BG = "#fff";
+const INACTIVE_COLOR = "#94a3b8";
+const ACTIVE_COLOR = "#5f6FFF";
 
 type AnimatedTabButtonProps = {
   children: React.ReactNode;
@@ -15,95 +27,103 @@ type AnimatedTabButtonProps = {
   onLongPress?: BottomTabBarButtonProps["onLongPress"];
   isFocused: boolean;
   label: string;
+  routeName: string;
 };
 
 function AnimatedTabButton({
   children,
   onPress,
   onLongPress,
-  isFocused,
+  isFocused: isFocusedProp,
   label,
+  routeName,
 }: AnimatedTabButtonProps) {
-  const scale = React.useRef(new Animated.Value(1)).current;
-  const widthAnim = React.useRef(new Animated.Value(isFocused ? 1 : 0)).current;
+  const pathname = usePathname();
 
-  React.useEffect(() => {
-    Animated.spring(widthAnim, {
-      toValue: isFocused ? 1 : 0,
-      useNativeDriver: false,
-      friction: 7,
-      tension: 60,
-    }).start();
+  // Deriving focus from both accessibility state and current pathname for maximum reliability
+  const isFocused = isFocusedProp || pathname === `/${routeName}` || (pathname === "/" && routeName === "home");
+
+  const isFocusedAnim = useSharedValue(isFocused ? 1 : 0);
+
+  useEffect(() => {
+    isFocusedAnim.value = withSpring(isFocused ? 1 : 0, {
+      damping: 18,
+      stiffness: 150,
+    });
   }, [isFocused]);
 
-  const handlePressIn = () =>
-    Animated.spring(scale, {
-      toValue: 0.9,
-      useNativeDriver: true,
-      friction: 5,
-    }).start();
-
-  const handlePressOut = () =>
-    Animated.spring(scale, {
-      toValue: 1,
-      useNativeDriver: true,
-      friction: 5,
-    }).start();
-
-  const animatedWidth = widthAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [48, 120],
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      // Balanced widths for 4 tabs: 110 active, 68 inactive
+      width: interpolate(isFocusedAnim.value, [0, 1], [68, 110]),
+      backgroundColor: interpolateColor(
+        isFocusedAnim.value,
+        [0, 1],
+        ["transparent", ACTIVE_BG]
+      ),
+      gap: 4, // Tight gap to save space
+    };
   });
 
-  const labelOpacity = widthAnim.interpolate({
-    inputRange: [0, 0.6, 1],
-    outputRange: [0, 0, 1],
+  const labelStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(isFocusedAnim.value, [0, 1], [0.6, 1]),
+      width: interpolate(isFocusedAnim.value, [0, 1], [42, 65]),
+    };
   });
 
   return (
     <Pressable
       onPress={(e) => onPress?.(e)}
       onLongPress={(e) => onLongPress?.(e)}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
       style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
     >
       <Animated.View
-        style={{
-          transform: [{ scale }],
-          width: animatedWidth,
-          height: 46,
-          borderRadius: 23,
-          backgroundColor: isFocused ? ACTIVE_BG : "transparent",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 6,
-          overflow: "hidden",
-        }}
+        style={[
+          {
+            height: 40, // More compact height
+            borderRadius: 20,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+            // Professional shadow for the active pill
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: isFocused ? 0.08 : 0,
+            shadowRadius: 3,
+            elevation: isFocused ? 3 : 0,
+          },
+          animatedStyle,
+        ]}
       >
-        {children}
-        <Animated.Text
-          style={{
-            opacity: labelOpacity,
-            color: ACTIVE_COLOR,
-            fontWeight: "600",
-            fontSize: 13,
-          }}
-          numberOfLines={1}
-        >
-          {label}
-        </Animated.Text>
+        <View style={{ width: 18, height: 18, alignItems: "center", justifyContent: "center" }}>
+          {children}
+        </View>
+        <Animated.View style={[{ overflow: 'hidden' }, labelStyle]}>
+          <Animated.Text
+            style={{
+              color: isFocused ? ACTIVE_COLOR : INACTIVE_COLOR,
+              fontWeight: "700",
+              fontSize: 11, // Slightly smaller for better fit
+              letterSpacing: -0.4,
+              width: 65,
+            }}
+            numberOfLines={1}
+          >
+            {label}
+          </Animated.Text>
+        </Animated.View>
       </Animated.View>
     </Pressable>
   );
 }
 
 const TABS = [
-  { name: "home", label: "Home", Icon: Home },
-  { name: "doctors", label: "Doctors", Icon: Search },
-  { name: "booking", label: "Booking", Icon: CalendarDays },
-  { name: "my-profile", label: "Profile", Icon: UserRound },
+  { name: "home", label: "Home", Icon: HomeIcon },
+  { name: "doctors", label: "Doctors", Icon: SearchIcon },
+  { name: "booking", label: "Booking", Icon: CalendarIcon },
+  { name: "my-profile", label: "Profile", Icon: UserIcon },
 ] as const;
 
 export default function TabLayout() {
@@ -115,19 +135,19 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: TAB_BAR_BG,
           borderTopWidth: 0,
-          height: 70,
-          paddingBottom: 10,
+          height: 70, // Optimized height
+          paddingBottom: 20,
           paddingTop: 10,
-          paddingHorizontal: 8,
-          borderRadius: 40,
-          marginHorizontal: 16,
-          marginBottom: 20,
+          paddingHorizontal: 10,
+          borderRadius: 35,
+          marginHorizontal: 12, // More margin to keep pill safe
+          marginBottom: 24,
           position: "absolute",
-          elevation: 10,
           shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
+          shadowOffset: { width: 0, height: 8 },
           shadowOpacity: 0.3,
-          shadowRadius: 12,
+          shadowRadius: 15,
+          elevation: 10,
         },
         tabBarButton: (props: BottomTabBarButtonProps) => {
           const tab = TABS.find((t) => t.name === route.name);
@@ -141,11 +161,12 @@ export default function TabLayout() {
               onLongPress={props.onLongPress}
               isFocused={isFocused}
               label={label}
+              routeName={route.name}
             >
               <Icon
-                size={22}
+                size={18}
                 color={isFocused ? ACTIVE_COLOR : INACTIVE_COLOR}
-                strokeWidth={isFocused ? 2.5 : 1.8}
+                strokeWidth={isFocused ? 2.5 : 2}
               />
             </AnimatedTabButton>
           );
