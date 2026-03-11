@@ -1,7 +1,8 @@
 import { AppContext, Doctor } from "@/context/AppContext";
 import { Image } from "expo-image";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+import { useRouter } from "expo-router";
+import { cssInterop } from "nativewind";
+import React, { useContext, useState } from "react";
 import {
   FlatList,
   ScrollView,
@@ -11,7 +12,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+cssInterop(Image, { className: "style" });
+
+const ALL = "All";
+
 const specialities = [
+  ALL,
   "General physician",
   "Gynecologist",
   "Dermatologist",
@@ -22,103 +28,117 @@ const specialities = [
 
 const Doctors: React.FC = () => {
   const router = useRouter();
-  const { speciality } = useLocalSearchParams<{ speciality?: string }>();
   const { doctors } = useContext(AppContext);
-  const [filter, setFilter] = useState<Doctor[]>([]);
-  const [showFilter, setShowFilter] = useState<boolean>(false);
+  const [selectedSpeciality, setSelectedSpeciality] = useState<string>(ALL);
 
-  const applyFilter = () => {
-    if (speciality) {
-      setFilter(doctors.filter((doc) => doc.speciality === speciality));
-    } else {
-      setFilter(doctors);
-    }
-  };
-
-  useEffect(() => {
-    applyFilter();
-  }, [doctors, speciality]);
-
-  const handleSpecialityPress = (item: string) => {
-    if (speciality === item) {
-      router.push("/(tabs)/doctors");
-    } else {
-      router.push("/(tabs)/doctors");
-    }
-  };
+  const filtered =
+    selectedSpeciality === ALL
+      ? doctors
+      : doctors.filter((doc) => doc.speciality === selectedSpeciality);
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={['top', 'left', 'right']}>
-      <ScrollView className="flex-1 px-4">
-        <Text className="text-gray-600 mt-2">
-          Browse through the doctors specialist.
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }} edges={["top", "left", "right"]}>
+
+      {/* ── Header ── */}
+      <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 }}>
+        <Text style={{ fontSize: 22, fontWeight: "700", color: "#111827" }}>
+          Find a Doctor
         </Text>
+        <Text style={{ fontSize: 13, color: "#6b7280", marginTop: 2 }}>
+          {filtered.length} doctor{filtered.length !== 1 ? "s" : ""} available
+        </Text>
+      </View>
 
-        <View className="flex-col sm:flex-row items-start gap-5 mt-5">
-          {/* Filter Toggle Button */}
-          <TouchableOpacity
-            className={`py-1 px-3 border rounded mb-3 ${showFilter ? "bg-[#5F6FFF]" : "bg-white"}`}
-            onPress={() => setShowFilter((prev) => !prev)}
-          >
-            <Text
-              className={`text-sm ${showFilter ? "text-white" : "text-gray-600"}`}
+      {/* ── Specialty Filter Chips ── */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ paddingVertical: 10, paddingLeft: 16, maxHeight: 56 }}
+        contentContainerStyle={{ gap: 8, alignItems: "center", paddingRight: 16 }}
+      >
+        {specialities.map((item) => {
+          const active = selectedSpeciality === item;
+          return (
+            <TouchableOpacity
+              key={item}
+              onPress={() => setSelectedSpeciality(item)}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 20,
+                backgroundColor: active ? "#5F6FFF" : "#f3f4f6",
+                borderWidth: active ? 0 : 1,
+                borderColor: "#e5e7eb",
+              }}
             >
-              Filters
-            </Text>
-          </TouchableOpacity>
-
-          {/* Filter List */}
-          {showFilter && (
-            <View className="flex-col gap-3 mb-5">
-              {specialities.map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handleSpecialityPress(item)}
-                  className={`pl-3 py-1.5 pr-16 border border-gray-300 rounded ${speciality === item ? "bg-[#5F6FFF]" : "bg-white"
-                    }`}
-                >
-                  <Text
-                    className={`text-sm ${speciality === item ? "text-white" : "text-gray-600"}`}
-                  >
-                    {item}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {/* Doctors Grid */}
-          <FlatList
-            className="w-full"
-            data={filter}
-            keyExtractor={(item) => item._id}
-            numColumns={2}
-            scrollEnabled={false}
-            columnWrapperStyle={{ gap: 12, marginBottom: 12 }}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                className="flex-1 border border-blue-200 rounded-xl overflow-hidden max-w-[48%]"
-              // onPress={() => router.push(`/appointment/${item._id}`)}
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontWeight: "600",
+                  color: active ? "#fff" : "#374151",
+                }}
               >
-                <Image
-                  source={item.image}
-                  className="w-full h-36 bg-blue-50"
-                />
-                <View className="p-4">
-                  <View className="flex-row items-center gap-2">
-                    <View className="w-2 h-2 bg-green-500 rounded-full" />
-                    <Text className="text-green-500 text-sm">Available</Text>
-                  </View>
-                  <Text className="text-gray-900 text-lg font-medium">
-                    {item.name}
-                  </Text>
-                  <Text className="text-gray-600 text-sm">{item.speciality}</Text>
-                </View>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
+                {item}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
+
+      {/* ── Doctors Grid ── */}
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item._id}
+        numColumns={2}
+        contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 24, paddingTop: 8 }}
+        columnWrapperStyle={{ gap: 12, marginBottom: 14 }}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <View style={{ flex: 1, alignItems: "center", marginTop: 60 }}>
+            <Text style={{ color: "#9ca3af", fontSize: 15 }}>No doctors found for this specialty.</Text>
+          </View>
+        }
+        renderItem={({ item }: { item: Doctor }) => (
+          <TouchableOpacity
+            onPress={() => router.push(`/appointment/${item._id}` as any)}
+            style={{
+              flex: 1,
+              maxWidth: "48%",
+              backgroundColor: "#fff",
+              borderRadius: 16,
+              overflow: "hidden",
+              borderWidth: 1,
+              borderColor: "#e0e7ff",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.06,
+              shadowRadius: 6,
+              elevation: 3,
+            }}
+          >
+            <Image
+              source={item.image}
+              style={{ width: "100%", height: 148, backgroundColor: "#eef2ff" }}
+              contentFit="cover"
+            />
+            <View style={{ padding: 12 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#22c55e" }} />
+                <Text style={{ fontSize: 11, color: "#16a34a", fontWeight: "600" }}>Available</Text>
+              </View>
+              <Text style={{ fontSize: 14, fontWeight: "700", color: "#111827" }} numberOfLines={1}>
+                {item.name}
+              </Text>
+              <Text style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }} numberOfLines={1}>
+                {item.speciality}
+              </Text>
+              <Text style={{ fontSize: 12, color: "#5F6FFF", fontWeight: "600", marginTop: 4 }}>
+                ${item.fees} · {item.experience}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
     </SafeAreaView>
   );
 };

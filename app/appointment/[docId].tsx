@@ -1,10 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
-import { Stack, useLocalSearchParams } from 'expo-router'
-import { AppContext } from '@/context/AppContext'
-import { assets } from '@/assets/images/assets';
+import { assets } from '@/assets/images/assets'
 import RelatedDoctors from '@/components/RelatedDoctors'
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppContext } from '@/context/AppContext'
+import { Image } from 'expo-image'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { ArrowLeft } from 'lucide-react-native'
+import { cssInterop } from 'nativewind'
+import React, { useContext, useEffect, useState } from 'react'
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+cssInterop(Image, { className: 'style' });
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -32,6 +37,7 @@ const DAYS_OF_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] as const
 
 const Appointment: React.FC = () => {
   const { docId } = useLocalSearchParams<{ docId: string }>()
+  const router = useRouter()
 
   const { doctors, currencySymbol } = useContext(AppContext)
 
@@ -98,52 +104,87 @@ const Appointment: React.FC = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }} edges={['left', 'right', 'bottom']}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView showsVerticalScrollIndicator={false}>
 
         {/* ── Doctor Details ── */}
-        <View className="flex-col gap-4">
+        <View>
 
-          {/* Doctor Image */}
-          <Image
-            source={docInfo.image}
-            className="bg-[#5F6FFF] w-full h-64"
-            resizeMode="cover"
-          />
+          {/* Doctor Image with back button */}
+          <View style={{ position: 'relative', backgroundColor: '#5F6FFF', paddingTop: 56 }}>
+            <Image
+              source={docInfo.image}
+              style={{ width: '100%', height: 240, backgroundColor: '#5F6FFF' }}
+              contentFit="cover"
+            />
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={{
+                position: 'absolute',
+                top: 52,
+                left: 16,
+                width: 38,
+                height: 38,
+                borderRadius: 19,
+                backgroundColor: 'rgba(255,255,255,0.9)',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ArrowLeft size={20} color="#1f2937" />
+            </TouchableOpacity>
+          </View>
 
           {/* Doctor Info Card */}
-          <View className="flex-1 border border-gray-400 rounded-lg p-8 py-7 bg-white mx-2 -mt-10">
+          <View style={{
+            backgroundColor: '#fff',
+            marginHorizontal: 12,
+            marginTop: -24,
+            borderRadius: 16,
+            padding: 20,
+            borderWidth: 1,
+            borderColor: '#e5e7eb',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.06,
+            shadowRadius: 8,
+            elevation: 4,
+          }}>
 
             {/* Name + Verified */}
-            <View className="flex-row items-center gap-2">
-              <Text className="text-2xl font-medium text-gray-900">{docInfo.name}</Text>
-              <Image source={assets.verified_icon} className="w-5 h-5" />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 22, fontWeight: '600', color: '#111827', flexShrink: 1 }}>
+                {docInfo.name}
+              </Text>
+              <Image source={assets.verified_icon} style={{ width: 20, height: 20 }} />
             </View>
 
             {/* Degree / Speciality / Experience */}
-            <View className="flex-row items-center gap-2 mt-1 flex-wrap">
-              <Text className="text-sm text-gray-600">
+            <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginTop: 6 }}>
+              <Text style={{ fontSize: 13, color: '#4b5563' }}>
                 {docInfo.degree} - {docInfo.speciality}
               </Text>
-              <View className="border border-gray-300 rounded-full px-2 py-0.5">
-                <Text className="text-xs text-gray-600">{docInfo.experience}</Text>
+              <View style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 2 }}>
+                <Text style={{ fontSize: 12, color: '#4b5563' }}>{docInfo.experience}</Text>
               </View>
             </View>
 
             {/* About */}
-            <View className="mt-3">
-              <View className="flex-row items-center gap-1">
-                <Text className="text-sm font-medium text-gray-900">About</Text>
-                <Image source={assets.info_icon} className="w-3.5 h-3.5" />
+            <View style={{ marginTop: 14 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: '#111827' }}>About</Text>
+                <Image source={assets.info_icon} style={{ width: 14, height: 14 }} />
               </View>
-              <Text className="text-sm text-gray-500 mt-1">{docInfo.about}</Text>
+              <Text style={{ fontSize: 13, color: '#6b7280', marginTop: 6, lineHeight: 20 }}>
+                {docInfo.about}
+              </Text>
             </View>
 
             {/* Fee */}
-            <Text className="text-gray-500 font-medium mt-4">
+            <Text style={{ color: '#6b7280', fontWeight: '500', marginTop: 14 }}>
               Appointment fee:{' '}
-              <Text className="text-gray-600">{currencySymbol}{docInfo.fees}</Text>
+              <Text style={{ color: '#374151', fontWeight: '700' }}>{currencySymbol}{docInfo.fees}</Text>
             </Text>
           </View>
         </View>
@@ -163,11 +204,10 @@ const Appointment: React.FC = () => {
               <TouchableOpacity
                 key={index}
                 onPress={() => setSlotIndex(index)}
-                className={`items-center justify-center py-6 w-16 rounded-full ${
-                  slotIndex === index
+                className={`items-center justify-center py-6 w-16 rounded-full ${slotIndex === index
                     ? 'bg-[#5F6FFF]'
                     : 'border border-gray-300 bg-white'
-                }`}
+                  }`}
               >
                 <Text className={`text-sm font-medium ${slotIndex === index ? 'text-white' : 'text-gray-600'}`}>
                   {daySlots[0] ? DAYS_OF_WEEK[daySlots[0].dateTime.getDay()] : ''}
@@ -190,16 +230,14 @@ const Appointment: React.FC = () => {
               <TouchableOpacity
                 key={index}
                 onPress={() => setSlotTime(slot.time)}
-                className={`px-5 py-2 rounded-full ${
-                  slot.time === slotTime
+                className={`px-5 py-2 rounded-full ${slot.time === slotTime
                     ? 'bg-[#5F6FFF]'
                     : 'border border-gray-300 bg-white'
-                }`}
+                  }`}
               >
                 <Text
-                  className={`text-sm font-light ${
-                    slot.time === slotTime ? 'text-white' : 'text-gray-400'
-                  }`}
+                  className={`text-sm font-light ${slot.time === slotTime ? 'text-white' : 'text-gray-400'
+                    }`}
                 >
                   {slot.time.toLowerCase()}
                 </Text>

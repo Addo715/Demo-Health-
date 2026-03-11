@@ -1,70 +1,137 @@
 import { AppContext, Doctor } from '@/context/AppContext';
 import { Image } from 'expo-image';
+import { cssInterop } from 'nativewind';
 import React, { useContext } from 'react';
-import { FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+cssInterop(Image, { className: 'style' });
 
 const MyBooking: React.FC = () => {
   const { doctors } = useContext(AppContext);
 
-  if (!doctors || doctors.length === 0) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-gray-500">No appointments available.</Text>
-      </View>
-    );
-  }
+  const appointments = doctors.slice(0, 3);
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={['top', 'left', 'right']}>
-      <ScrollView className="flex-1 px-4">
-        <Text className="pb-3 mt-4 font-medium text-zinc-700 border-b border-gray-200">
-          My Appointments
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }} edges={['top', 'left', 'right']}>
+
+      {/* ── Header ── */}
+      <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f3f4f6' }}>
+        <Text style={{ fontSize: 22, fontWeight: '700', color: '#111827' }}>My Appointments</Text>
+        <Text style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>
+          {appointments.length} upcoming appointment{appointments.length !== 1 ? 's' : ''}
         </Text>
+      </View>
 
+      {appointments.length === 0 ? (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <Text style={{ fontSize: 16, fontWeight: '600', color: '#374151' }}>No appointments yet</Text>
+          <Text style={{ fontSize: 13, color: '#9ca3af' }}>Book a doctor to get started</Text>
+        </View>
+      ) : (
         <FlatList
-          data={doctors.slice(0, 3)}
+          data={appointments}
           keyExtractor={(item: Doctor) => item._id}
-          scrollEnabled={false}
+          contentContainerStyle={{ padding: 16, gap: 14 }}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <View className="flex-row gap-4 py-4 border-b border-gray-200">
+            <View style={{
+              backgroundColor: '#fff',
+              borderRadius: 18,
+              overflow: 'hidden',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.06,
+              shadowRadius: 8,
+              elevation: 3,
+              borderWidth: 1,
+              borderColor: '#f0f0f0',
+            }}>
 
-              {/* Image */}
-              <Image
-                source={item.image}
-                className="w-32 h-32 bg-indigo-50 rounded"
-                contentFit="cover"
-              />
+              {/* ── Top: Image + Info ── */}
+              <View style={{ flexDirection: 'row', gap: 14, padding: 14 }}>
 
-              {/* Info */}
-              <View className="flex-1 gap-1">
-                <Text className="text-zinc-800 font-semibold text-sm">{item.name}</Text>
-                <Text className="text-zinc-600 text-sm">{item.speciality}</Text>
-                <Text className="text-zinc-700 font-medium text-sm mt-1">Address:</Text>
-                <Text className="text-zinc-600 text-xs">{item.address?.line1}</Text>
-                <Text className="text-zinc-600 text-xs">{item.address?.line2}</Text>
-                <Text className="text-zinc-600 text-sm mt-1">
-                  <Text className="text-zinc-700 font-medium">Date & Time: </Text>
-                  01 May 2025 | 11:50 AM
+                {/* Doctor Image */}
+                <Image
+                  source={item.image}
+                  style={{ width: 90, height: 100, borderRadius: 14, backgroundColor: '#eef2ff' }}
+                  contentFit="cover"
+                />
+
+                {/* Doctor Info */}
+                <View style={{ flex: 1, justifyContent: 'center', gap: 4 }}>
+                  {/* Status Badge */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 2 }}>
+                    <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: '#22c55e' }} />
+                    <Text style={{ fontSize: 11, color: '#16a34a', fontWeight: '600' }}>Confirmed</Text>
+                  </View>
+
+                  <Text style={{ fontSize: 15, fontWeight: '700', color: '#111827' }} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  <Text style={{ fontSize: 12, color: '#5F6FFF', fontWeight: '600' }}>
+                    {item.speciality}
+                  </Text>
+                  <Text style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }} numberOfLines={1}>
+                    {item.address?.line1}
+                  </Text>
+                  <Text style={{ fontSize: 12, color: '#9ca3af' }} numberOfLines={1}>
+                    {item.address?.line2}
+                  </Text>
+                </View>
+              </View>
+
+              {/* ── Date & Time Banner ── */}
+              <View style={{
+                backgroundColor: '#f5f7ff',
+                marginHorizontal: 14,
+                borderRadius: 10,
+                paddingHorizontal: 14,
+                paddingVertical: 10,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 6,
+              }}>
+                <Text style={{ fontSize: 13, color: '#374151', fontWeight: '600' }}>
+                  01 May 2025
+                </Text>
+                <Text style={{ fontSize: 13, color: '#9ca3af' }}>·</Text>
+                <Text style={{ fontSize: 13, color: '#374151', fontWeight: '600' }}>
+                  11:50 AM
                 </Text>
               </View>
 
-              {/* Buttons */}
-              <View className="justify-end gap-2">
-                <TouchableOpacity className="border border-gray-300 rounded py-2 px-3 items-center">
-                  <Text className="text-stone-500 text-sm">Pay Online</Text>
+              {/* ── Buttons ── */}
+              <View style={{ flexDirection: 'row', gap: 10, padding: 14 }}>
+                <TouchableOpacity style={{
+                  flex: 1,
+                  paddingVertical: 11,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  backgroundColor: '#5F6FFF',
+                }}>
+                  <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>Pay Online</Text>
                 </TouchableOpacity>
-                <TouchableOpacity className="border border-gray-300 rounded py-2 px-3 items-center">
-                  <Text className="text-red-500 text-sm">Cancel appointment</Text>
+
+                <TouchableOpacity style={{
+                  flex: 1,
+                  paddingVertical: 11,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  backgroundColor: '#fff',
+                  borderWidth: 1,
+                  borderColor: '#fca5a5',
+                }}>
+                  <Text style={{ color: '#ef4444', fontSize: 13, fontWeight: '700' }}>Cancel</Text>
                 </TouchableOpacity>
               </View>
 
             </View>
           )}
         />
-      </ScrollView>
+      )}
     </SafeAreaView>
   );
 };
 
-export default MyBooking;
+export default MyBooking;
