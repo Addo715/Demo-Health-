@@ -16,10 +16,10 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
-const TAB_BAR_BG = "#1a1a2e";
-const ACTIVE_BG = "#fff";
-const INACTIVE_COLOR = "#94a3b8";
-const ACTIVE_COLOR = "#5f6FFF";
+const TAB_BAR_BG = "#ffffff";     // white
+const ACTIVE_BG = "#5f6FFF";  // blue (was #1e3a8a)
+const INACTIVE_COLOR = "#9ca3af"; // gray icons
+const ACTIVE_COLOR = "#ffffff";   // white text + icon
 
 type AnimatedTabButtonProps = {
   children: React.ReactNode;
@@ -40,35 +40,43 @@ function AnimatedTabButton({
 }: AnimatedTabButtonProps) {
   const pathname = usePathname();
 
-  // Deriving focus from both accessibility state and current pathname for maximum reliability
-  const isFocused = isFocusedProp || pathname === `/${routeName}` || (pathname === "/" && routeName === "home");
+  const isFocused =
+    isFocusedProp ||
+    pathname === `/${routeName}` ||
+    (pathname === "/" && routeName === "home");
 
+  // Only animate when becoming active
   const isFocusedAnim = useSharedValue(isFocused ? 1 : 0);
 
   useEffect(() => {
-    isFocusedAnim.value = withSpring(isFocused ? 1 : 0, {
-      damping: 18,
-      stiffness: 150,
-    });
+    if (isFocused) {
+      // Only run spring animation when this tab becomes active
+      isFocusedAnim.value = withSpring(1, {
+        damping: 18,
+        stiffness: 150,
+      });
+    } else {
+      // Instantly snap to 0 when inactive — no bounce
+      isFocusedAnim.value = 0;
+    }
   }, [isFocused]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      // Balanced widths for 4 tabs: 110 active, 68 inactive
-      width: interpolate(isFocusedAnim.value, [0, 1], [68, 110]),
+      width: interpolate(isFocusedAnim.value, [0, 1], [44, 90]),
       backgroundColor: interpolateColor(
         isFocusedAnim.value,
         [0, 1],
         ["transparent", ACTIVE_BG]
       ),
-      gap: 4, // Tight gap to save space
     };
   });
 
   const labelStyle = useAnimatedStyle(() => {
     return {
-      opacity: interpolate(isFocusedAnim.value, [0, 1], [0.6, 1]),
-      width: interpolate(isFocusedAnim.value, [0, 1], [42, 65]),
+      opacity: interpolate(isFocusedAnim.value, [0, 1], [0, 1]),
+      width: interpolate(isFocusedAnim.value, [0, 1], [0, 55]),
+      marginLeft: interpolate(isFocusedAnim.value, [0, 1], [0, 4]),
     };
   });
 
@@ -81,35 +89,37 @@ function AnimatedTabButton({
       <Animated.View
         style={[
           {
-            height: 40, // More compact height
+            height: 40,
             borderRadius: 20,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
             overflow: "hidden",
-            // Professional shadow for the active pill
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: isFocused ? 0.08 : 0,
-            shadowRadius: 3,
-            elevation: isFocused ? 3 : 0,
+            paddingHorizontal: 10,
           },
           animatedStyle,
         ]}
       >
-        <View style={{ width: 18, height: 18, alignItems: "center", justifyContent: "center" }}>
+        <View
+          style={{
+            width: 18,
+            height: 18,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           {children}
         </View>
-        <Animated.View style={[{ overflow: 'hidden' }, labelStyle]}>
+
+        <Animated.View style={[{ overflow: "hidden" }, labelStyle]}>
           <Animated.Text
-            style={{
-              color: isFocused ? ACTIVE_COLOR : INACTIVE_COLOR,
-              fontWeight: "700",
-              fontSize: 11, // Slightly smaller for better fit
-              letterSpacing: -0.4,
-              width: 65,
-            }}
             numberOfLines={1}
+            style={{
+              color: ACTIVE_COLOR,
+              fontWeight: "700",
+              fontSize: 11,
+              letterSpacing: -0.4,
+            }}
           >
             {label}
           </Animated.Text>
@@ -135,19 +145,20 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: TAB_BAR_BG,
           borderTopWidth: 0,
-          height: 70, // Optimized height
+          height: 70,
           paddingBottom: 20,
           paddingTop: 10,
           paddingHorizontal: 10,
           borderRadius: 35,
-          marginHorizontal: 12, // More margin to keep pill safe
+          marginHorizontal: 12,
           marginBottom: 24,
           position: "absolute",
+          // Box shadow
           shadowColor: "#000",
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.3,
-          shadowRadius: 15,
-          elevation: 10,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.1,
+          shadowRadius: 16,
+          elevation: 12,
         },
         tabBarButton: (props: BottomTabBarButtonProps) => {
           const tab = TABS.find((t) => t.name === route.name);

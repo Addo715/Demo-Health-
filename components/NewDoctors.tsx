@@ -33,21 +33,31 @@ const NewDoctors: React.FC = () => {
   );
 
   return (
-    <View className="gap-4 my-16 mx-2.5">
+    <View className="gap-4 my-6 mx-2.5 mt-10">
+
+      {/* Title row */}
+      <View className="flex-row items-center justify-between px-2">
+        <Text className="text-lg font-bold text-gray-900">Top Doctors to Book</Text>
+        <TouchableOpacity onPress={() => router.push('/doctors')}>
+          <Text className="text-sm font-semibold text-[#5f6FFF]">View all</Text>
+        </TouchableOpacity>
+      </View>
+
       <FlatList
-        data={doctors.slice(0, 10)}
+        data={doctors.slice(0, 4)}
         keyExtractor={(item: Doctor) => item._id}
         numColumns={2}
         scrollEnabled={false}
         columnWrapperStyle={{ gap: 12, marginBottom: 12 }}
         renderItem={renderItem}
       />
-      <TouchableOpacity
-        className="border border-gray-200 bg-white px-14 py-3.5 rounded-full mt-12 self-center active:bg-gray-50"
+
+      {/* <TouchableOpacity
+        className="border border-gray-200 bg-white px-14 py-3.5 rounded-full mt-4 self-center active:bg-gray-50"
         onPress={() => router.push('/doctors')}
       >
         <Text className="text-gray-600 font-semibold text-sm">See More</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };
