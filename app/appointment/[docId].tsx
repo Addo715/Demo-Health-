@@ -3,13 +3,22 @@ import RelatedDoctors from '@/components/RelatedDoctors'
 import { AppContext } from '@/context/AppContext'
 import { Image } from 'expo-image'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
-import { ArrowLeft } from 'lucide-react-native'
+import { ArrowLeft, CheckCircle } from 'lucide-react-native'
 import { cssInterop } from 'nativewind'
-import React, { useContext, useEffect, useState } from 'react'
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import {
+  ActivityIndicator,
+  Animated,
+  Platform,
+  ScrollView,
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-cssInterop(Image, { className: 'style' });
+cssInterop(Image, { className: 'style' })
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,6 +42,64 @@ interface Doctor {
 
 const DAYS_OF_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] as const
 
+// ─── iOS Toast Component ──────────────────────────────────────────────────────
+
+const IOSToast: React.FC<{ visible: boolean; message: string }> = ({ visible, message }) => {
+  const opacity = useRef(new Animated.Value(0)).current
+  const translateY = useRef(new Animated.Value(20)).current
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.timing(opacity, { toValue: 1, duration: 250, useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: 0, duration: 250, useNativeDriver: true }),
+      ]).start()
+    } else {
+      Animated.parallel([
+        Animated.timing(opacity, { toValue: 0, duration: 250, useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: 20, duration: 250, useNativeDriver: true }),
+      ]).start()
+    }
+  }, [visible])
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={{
+        position: 'absolute',
+        bottom: 40,
+        left: 24,
+        right: 24,
+        opacity,
+        transform: [{ translateY }],
+        zIndex: 999,
+      }}
+    >
+      <View
+        style={{
+          backgroundColor: '#1a1a2e',
+          borderRadius: 14,
+          paddingHorizontal: 18,
+          paddingVertical: 14,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 10,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 12,
+          elevation: 10,
+        }}
+      >
+        <CheckCircle size={18} color="#22c55e" />
+        <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600', flex: 1 }}>
+          {message}
+        </Text>
+      </View>
+    </Animated.View>
+  )
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const Appointment: React.FC = () => {
@@ -45,6 +112,10 @@ const Appointment: React.FC = () => {
   const [docSlots, setDocSlots] = useState<TimeSlot[][]>([])
   const [slotIndex, setSlotIndex] = useState<number>(0)
   const [slotTime, setSlotTime] = useState<string>('')
+
+  // Toast state (iOS only — Android uses ToastAndroid)
+  const [toastVisible, setToastVisible] = useState<boolean>(false)
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // ── Fetch Doctor Info ──────────────────────────────────────────────────────
 
@@ -93,6 +164,36 @@ const Appointment: React.FC = () => {
     setDocSlots(allSlots)
   }, [docInfo])
 
+  // ── Show Toast ─────────────────────────────────────────────────────────────
+
+  const showToast = (): void => {
+    if (!slotTime) {
+      // No time selected — show a warning toast
+      const msg = 'Please select a time slot first'
+      if (Platform.OS === 'android') {
+        ToastAndroid.show(msg, ToastAndroid.SHORT)
+      } else {
+        triggerIOSToast(msg)
+      }
+      return
+    }
+
+    const msg = `Appointment booked for ${slotTime}`
+    if (Platform.OS === 'android') {
+      ToastAndroid.show(msg, ToastAndroid.LONG)
+    } else {
+      triggerIOSToast(msg)
+    }
+  }
+
+  const triggerIOSToast = (msg: string): void => {
+    setToastVisible(true)
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
+    toastTimerRef.current = setTimeout(() => {
+      setToastVisible(false)
+    }, 3000)
+  }
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   if (!docInfo) {
@@ -106,6 +207,7 @@ const Appointment: React.FC = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }} edges={['left', 'right', 'bottom']}>
       <Stack.Screen options={{ headerShown: false }} />
+
       <ScrollView showsVerticalScrollIndicator={false}>
 
         {/* ── Doctor Details ── */}
@@ -184,7 +286,9 @@ const Appointment: React.FC = () => {
             {/* Fee */}
             <Text style={{ color: '#6b7280', fontWeight: '500', marginTop: 14 }}>
               Appointment fee:{' '}
-              <Text style={{ color: '#374151', fontWeight: '700' }}>{currencySymbol}{docInfo.fees}</Text>
+              <Text style={{ color: '#374151', fontWeight: '700' }}>
+                {currencySymbol}{docInfo.fees}
+              </Text>
             </Text>
           </View>
         </View>
@@ -204,10 +308,9 @@ const Appointment: React.FC = () => {
               <TouchableOpacity
                 key={index}
                 onPress={() => setSlotIndex(index)}
-                className={`items-center justify-center py-6 w-16 rounded-full ${slotIndex === index
-                    ? 'bg-[#5F6FFF]'
-                    : 'border border-gray-300 bg-white'
-                  }`}
+                className={`items-center justify-center py-6 w-16 rounded-full ${
+                  slotIndex === index ? 'bg-[#5F6FFF]' : 'border border-gray-300 bg-white'
+                }`}
               >
                 <Text className={`text-sm font-medium ${slotIndex === index ? 'text-white' : 'text-gray-600'}`}>
                   {daySlots[0] ? DAYS_OF_WEEK[daySlots[0].dateTime.getDay()] : ''}
@@ -230,14 +333,14 @@ const Appointment: React.FC = () => {
               <TouchableOpacity
                 key={index}
                 onPress={() => setSlotTime(slot.time)}
-                className={`px-5 py-2 rounded-full ${slot.time === slotTime
-                    ? 'bg-[#5F6FFF]'
-                    : 'border border-gray-300 bg-white'
-                  }`}
+                className={`px-5 py-2 rounded-full ${
+                  slot.time === slotTime ? 'bg-[#5F6FFF]' : 'border border-gray-300 bg-white'
+                }`}
               >
                 <Text
-                  className={`text-sm font-light ${slot.time === slotTime ? 'text-white' : 'text-gray-400'
-                    }`}
+                  className={`text-sm font-light ${
+                    slot.time === slotTime ? 'text-white' : 'text-gray-400'
+                  }`}
                 >
                   {slot.time.toLowerCase()}
                 </Text>
@@ -246,7 +349,10 @@ const Appointment: React.FC = () => {
           </ScrollView>
 
           {/* Book Button */}
-          <TouchableOpacity className="bg-[#5F6FFF] rounded-full px-14 py-3 my-6 self-start">
+          <TouchableOpacity
+            onPress={showToast}
+            className="bg-[#5F6FFF] rounded-full px-14 py-3 my-6 self-start"
+          >
             <Text className="text-white text-sm font-light">Book an Appointment</Text>
           </TouchableOpacity>
         </View>
@@ -255,6 +361,15 @@ const Appointment: React.FC = () => {
         <RelatedDoctors docId={docId} speciality={docInfo.speciality} />
 
       </ScrollView>
+
+      {/* iOS Toast — sits above everything */}
+      {Platform.OS === 'ios' && (
+        <IOSToast
+          visible={toastVisible}
+          message={slotTime ? `Appointment booked for ${slotTime}` : 'Please select a time slot first'}
+        />
+      )}
+
     </SafeAreaView>
   )
 }

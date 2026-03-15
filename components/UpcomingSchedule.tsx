@@ -1,8 +1,20 @@
 import { CalendarDays, Clock, Video } from 'lucide-react-native';
 import React from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useRouter } from 'expo-router';
 
-const appointments = [
+// ─── Types ────────────────────────────────────────────────────────────────────
+type Appointment = {
+  id: string;
+  doctor: string;
+  speciality: string;
+  dateFrom: string;
+  dateTo: string;
+  image: string;
+};
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+const appointments: Appointment[] = [
   {
     id: '1',
     doctor: 'Prof. Dr. Logan Mason',
@@ -29,16 +41,50 @@ const appointments = [
   },
 ];
 
+// ─── Component ────────────────────────────────────────────────────────────────
 const UpcomingSchedule: React.FC = () => {
+  const router = useRouter();
+
+  const handleCardPress = (item: Appointment): void => {
+    router.push({
+      pathname: '/doctorchat/page' as any,
+      params: {
+        id: item.id,
+        doctor: item.doctor,
+        speciality: item.speciality,
+        image: item.image,
+        dateFrom: item.dateFrom,
+        dateTo: item.dateTo,
+      },
+    });
+  };
+
+  const handleVideoPress = (item: Appointment): void => {
+    router.push({
+      pathname: '/doctorchat/page' as any,
+      params: {
+        id: item.id,
+        doctor: item.doctor,
+        speciality: item.speciality,
+        image: item.image,
+        dateFrom: item.dateFrom,
+        dateTo: item.dateTo,
+        startCall: 'video',
+      },
+    });
+  };
+
   return (
     <View className="px-5 mt-10 gap-4">
 
-      {/* Header */}
+      {/* ── Header ── */}
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-2">
           <Text className="text-lg font-bold text-gray-900">Upcoming Schedule</Text>
           <View className="bg-[#5f6FFF] rounded-full w-6 h-6 items-center justify-center">
-            <Text className="text-white text-[11px] font-bold">{appointments.length}</Text>
+            <Text className="text-white text-[11px] font-bold">
+              {appointments.length}
+            </Text>
           </View>
         </View>
         <TouchableOpacity>
@@ -46,22 +92,23 @@ const UpcomingSchedule: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Cards */}
+      {/* ── Cards ── */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: 12, paddingVertical: 8, paddingHorizontal: 2 }}
       >
         {appointments.map((item) => (
-          <View
+          <TouchableOpacity
             key={item.id}
+            onPress={() => handleCardPress(item)}
+            activeOpacity={0.85}
             style={{
               width: 280,
               backgroundColor: '#fff',
               borderRadius: 20,
               padding: 30,
               gap: 25,
-              // Shadow
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.08,
@@ -83,13 +130,18 @@ const UpcomingSchedule: React.FC = () => {
                   }}
                 />
                 <View>
-                  <Text className="text-gray-900 font-bold text-sm">{item.doctor}</Text>
-                  <Text className="text-gray-400 text-xs mt-0.5">{item.speciality}</Text>
+                  <Text className="text-gray-900 font-bold text-sm">
+                    {item.doctor}
+                  </Text>
+                  <Text className="text-gray-400 text-xs mt-0.5">
+                    {item.speciality}
+                  </Text>
                 </View>
               </View>
 
               {/* Video icon */}
               <TouchableOpacity
+                onPress={() => handleVideoPress(item)}
                 style={{
                   backgroundColor: '#eff2ff',
                   width: 36,
@@ -117,7 +169,7 @@ const UpcomingSchedule: React.FC = () => {
                 <Text className="text-gray-500 text-xs">{item.dateTo}</Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
